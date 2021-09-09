@@ -1,0 +1,15 @@
+---
+
+
+- name: "Webserver Package Installation"
+  yum:
+    name: httpd
+    state: present
+  notify:
+    - Restarting-enabling-httpd
+
+- name: "PHP Package Installation"
+  shell: amazon-linux-extras install php7.4 -y
+  notify:
+    - Restarting-enabling-httpd
+

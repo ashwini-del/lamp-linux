@@ -1,0 +1,7 @@
+---
+
+- name: "Restarting-enabling-httpd"
+  service:
+       name: httpd
+       state: restarted
+       enabled: true
