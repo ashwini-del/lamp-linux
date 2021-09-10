@@ -80,7 +80,7 @@ ansible -i inventoryfile all -m ping
 Once you have established the connection then check for any syntax error in the playbook:
 
 ```sh
-ansible-playbook -i hosts YOUR_PLAYBOOK_FILE.yml --syntax-check
+ansible-playbook -i inventoryfile YOUR_PLAYBOOK_FILE.yml --syntax-check
 ```
 
 if all checks have pass then you are good to execute the ansible-playbook:
