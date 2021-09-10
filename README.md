@@ -93,5 +93,3 @@ Please note the inventory file should be present in the same directory also i ha
 So I have copied the ssh private key file as "KEY_NAME.pem" in the same directory with read permission granted to the User/Owner (eg: chmod 400 KEY_NAME.pem).
 
 After Ansible deployment, login to the client servers and check if everything is as good as it was planned.
-
-
