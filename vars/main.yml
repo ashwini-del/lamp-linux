@@ -1,0 +1,10 @@
+---
+#mysql_root_password: ""
+#app_user: "root"
+#http_host: "ssl.cloudns.nz"
+#http_conf: "ssl.cloudns.nz.conf"
+http_port: "80"
+disable_default: true
+db_user: "root"
+db_pass: "root"
+db_name: "ash"
