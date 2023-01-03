@@ -1,11 +1,4 @@
-- 
- name: Deploy E-Commerce website using LAMP Stack
- hosts: web
- vars:
-  mylocal: localhost
-  phpindex: index.php
- become: yes
- tasks:
+
   - name: Install firewalld
     yum: 
      name: firewalld
@@ -44,10 +37,10 @@
      immediate: yes
      state: enabled
   
-  - name: install epel
-    yum: 
-     name: epel-release
-     state: present
+       #  - name: install epel
+       #yum: 
+       # name: epel-release
+       # state: present
  
   - name: install python-pip
     yum: 
@@ -77,13 +70,6 @@
      priv: '*.*:ALL,GRANT'
      state: present
 
-  - name: import ecom-table sql file
-    mysql_db:
-     state: import
-     name: ecomdb
-     target: /home/student1/ansilab/db-load-script.sql
-    ignore_errors: True
-
   - name: Deploy and Configure web
     yum:
      name:
@@ -105,24 +91,14 @@
     service: 
      name: httpd
      state: started
-  
-  - name: Enable httpd
-    systemd:
-     name: httpd
-     enabled: yes
-
-  - name: cloning a git repo
-    git: 
-     repo: 'https://github.com/kodekloudhub/learning-app-ecommerce.git'
-     dest: /var/www/html/
-    ignore_errors: True
-
-  - name: Changing index.directory
+  - name: Changing httpd index.directory
     template:
-     src: /home/student1/ansilab/httpd.conf.j2
-     dest: /etc/httpd/conf/httpd.conf
+     src: files/index.html
+       #  dest: /etc/httpd/conf/httpd.conf
+     dest: /var/www/html/index.html
 
-  - name: Changing host in index.php
+
+  - name: Changing php in index.php
     template:
-     src: /home/student1/ansilab/index.php.j2
+     src: files/info.php.j2
      dest: /var/www/html/index.php
