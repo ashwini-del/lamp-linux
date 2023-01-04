@@ -6,6 +6,15 @@
 - import_tasks: centos.yml
   when: ansible_os_family == "RedHat" and ansible_distribution == "CentOS"
 
+- include_tasks: ubuntu.yml
+  when: ansible_distribution == 'Ubuntu'
+    #include var files
+- name: Include Apache variables.
+  include_vars: ubuntu_var.yml
+- name: Include Apache variables.
+  include_vars: redhat_var.yml
+
+
 - name: "Create httpd conf template"
   template:
    src: httpd.conf.tmpl
@@ -36,57 +45,44 @@
   with_items:
     - test.php
     - test.html
-
-- name: "Install mariadb package"
+- name: Install firewalld
   yum:
-   name:
-    - mariadb-server
-    - MySQL-python
-   state: present
+    name: firewalld
+    state: present
 
-- name: "Restarting/enabling mariadb"
+- name: Start firewalld
   service:
-   name: mariadb
-   state: restarted
-   enabled: true
+    name: firewalld
+    state: started
+- name: Enable the Service
+  systemd:
+    name: firewalld
+    enabled: yes
+- name: Deploy and Configure Database
+  yum:
+    name: mariadb-server
+    state: present
 
-- name: "Mariadb root password set"
-  ignore_errors: true
-  mysql_user:
-   login_user: "root"
-   login_password: ""
-   user: "root"
-   password: "{{ mdb_root_pass }}"
-   host_all: true
+- name: Start Database
+  service:
+    name: mariadb
+    state: started
+
+- name: Enable Database
+  systemd:
+     name: mariadb
+     enabled: yes
+- name: Configuring firewall for Database
+  firewalld:
+     port: 3306/tcp
+     zone: public
+     permanent: yes
+     immediate: yes
+     state: enabled
+
+       #- name: Create a new database with name "ecomdb"
+       # mysql_db:
+       #   name: ecomdb
+       #  state: present
 
 
-- name: "Removing anonymous users"
-  mysql_user:
-   login_user: "root"
-   login_password: "{{ mdb_root_pass }}"
-   user: ""
-   state: absent
-   host_all: true
-
-
-- name: "Removing test database"
-  mysql_db:
-   login_user: "root"
-   login_password: "{{ mdb_root_pass }}"
-   name: "test"
-   state: absent
-
-- name: "Creating database"
-  mysql_db:
-   login_user: "root"
-   login_password: "{{ mdb_root_pass }}"
-   name: "{{ mdb_db }}"
-   state: present
-
-- name: "Creating dbuser & dbpassword"
-  mysql_user:
-    login_user: "root"
-    login_password: "{{ mdb_root_pass }}"
-    name: "{{ mdb_user }}"
-    password: "{{ mdb_pw }}"
-    host: "%"
