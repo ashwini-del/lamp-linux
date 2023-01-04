@@ -1,0 +1,16 @@
+---
+- import_tasks: amazon_linux.yml
+  when: ansible_os_family == "RedHat" and ansible_distribution == "Amazon linux"
+
+- import_tasks: centos.yml
+  when: ansible_os_family == "RedHat" and ansible_distribution == "CentOS"
+- import_tasks: redhat.yml
+  when: ansible_os_family == "RedHat" and ansible_distribution == "redhat"
+
+- include_tasks: ubuntu.yml
+  when: ansible_os_family == "Ubuntu" and ansible_distribution == 'Ubuntu'
+    #include var files
+- name: Include Apache variables.
+  include_vars: ubuntu_var.yml
+- name: Include Apache variables.
+  include_vars: amazon_linux_var.yml

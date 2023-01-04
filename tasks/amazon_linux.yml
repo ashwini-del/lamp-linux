@@ -1,0 +1,101 @@
+---
+- name: "Webserver Package Installation"
+  yum:
+    name: httpd
+    state: present
+  notify:
+    - Restarting-enabling-httpd
+
+- name: "PHP Package Installation"
+  shell: amazon-linux-extras install php7.4 -y
+- name: "Create httpd conf template"
+  template:
+   src: httpd.conf.tmpl
+   dest: /etc/httpd/conf/httpd.conf
+  notify:
+   - Restarting-enabling-httpd
+
+- name: "Create vhost from template"
+  template:
+   src: vhost.conf.tmpl
+   dest: "/etc/httpd/conf.d/{{ domain_name }}.conf"
+  notify:
+   - Restarting-enabling-httpd
+
+- name: "Create documentroot"
+  file:
+   path: "{{ doc_root }}/{{ domain_name }}/"
+   state: directory
+   owner: "{{ httpd_user }}"
+   group: "{{ httpd_group }}"
+
+- name: "Create test.php and test.html"
+  copy:
+    src: "{{ item }}"
+    dest: "{{ doc_root }}/{{ domain_name }}/"
+    owner: "{{ httpd_user }}"
+    group: "{{ httpd_group }}"
+  with_items:
+    - test.php
+    - test.html
+#Installing the database
+- name: Install firewalld
+  yum: 
+    name: firewalld
+    state: present
+
+- name: Start firewalld
+  service: 
+    name: firewalld
+    state: started
+
+- name: Enable the Service
+  systemd:
+    name: firewalld
+    enabled: yes 
+
+- name: Deploy and Configure Database
+  yum: 
+    name: mariadb-server
+    state: present
+  
+- name: Start Database
+  service: 
+    name: mariadb
+    state: started
+
+- name: Enable Database
+  systemd:
+    name: mariadb
+    enabled: yes
+
+- name: Configuring firewall for Database
+  firewalld:
+    port: 3306/tcp
+    zone: public
+    permanent: yes
+    immediate: yes
+    state: enabled
+
+- name: Make sure pymysql is present
+  pip:
+    name: pymysql
+    state: present
+
+- name: Install mysql
+  yum:
+    name: MySQL-python
+    state: latest
+
+- name: Create a new database with name "ecomdb"
+  mysql_db:
+    name: ecomdb
+    state: present
+
+- name: Create new user "ecomuser"
+  mysql_user:
+    host: localhost
+    name: ecomuser
+    password: ecompassword
+    priv: '*.*:ALL,GRANT'
+    state: present

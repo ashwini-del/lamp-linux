@@ -1,0 +1,23 @@
+---
+
+- name: "Restarting-enabling-httpd"
+  service:
+       name: httpd
+       state: restarted
+       enabled: true
+
+#handlers for ubuntu
+- name: Reload Apache
+  service:
+       name: apache2
+       state: reloaded
+
+- name: Restart Apache
+  service:
+       name: apache2
+       state: restarted
+- name: Restart mysql
+  service:
+       name: mysql
+       state: restarted
+

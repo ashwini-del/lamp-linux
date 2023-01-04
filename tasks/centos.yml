@@ -1,0 +1,35 @@
+---
+
+- name: "Install remi and epel"
+  yum:
+   name:
+    - "{{ remi_release_url }}"
+    - "{{ epel_release_url }}"
+  become: true
+
+
+- name: "Get Remi Key"
+  get_url:
+    url: "{{ remi_key_url }}"
+    dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-remi
+  become: true
+
+
+- name: "Updating all packages"
+  yum:
+   name: "*"
+   state: latest
+
+
+- name: "Install httpd & php packages"
+  yum:
+   name:
+    - php
+    - httpd
+    - php-fpm
+    - php-mysql
+   state: present
+   enablerepo: "remi-{{ php_version }},epel"
+  become: true
+ 
+
