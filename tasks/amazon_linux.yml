@@ -1,11 +1,12 @@
 ---
-- name: "Webserver Package Installation"
+#httpd installation
+- name: "Webserver Package Installation for linux"
   yum:
     name: httpd
     state: present
   notify:
     - Restarting-enabling-httpd
-
+#php installation
 - name: "PHP Package Installation"
   shell: amazon-linux-extras install php7.4 -y
 - name: "Create httpd conf template"
@@ -14,21 +15,21 @@
    dest: /etc/httpd/conf/httpd.conf
   notify:
    - Restarting-enabling-httpd
-
+#add vhost template
 - name: "Create vhost from template"
   template:
    src: vhost.conf.tmpl
    dest: "/etc/httpd/conf.d/{{ domain_name }}.conf"
   notify:
    - Restarting-enabling-httpd
-
+# create Document root
 - name: "Create documentroot"
   file:
    path: "{{ doc_root }}/{{ domain_name }}/"
    state: directory
    owner: "{{ httpd_user }}"
    group: "{{ httpd_group }}"
-
+#add default page of php
 - name: "Create test.php and test.html"
   copy:
     src: "{{ item }}"
@@ -86,16 +87,3 @@
   yum:
     name: MySQL-python
     state: latest
-
-- name: Create a new database with name "ecomdb"
-  mysql_db:
-    name: ecomdb
-    state: present
-
-- name: Create new user "ecomuser"
-  mysql_user:
-    host: localhost
-    name: ecomuser
-    password: ecompassword
-    priv: '*.*:ALL,GRANT'
-    state: present

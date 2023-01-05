@@ -1,6 +1,6 @@
 http_port: "80"
 disable_default: true
 db_user: "root"
-db_pass: ""
-db_name: "ash"
+db_pass: "root"
+db_name: "root"
 

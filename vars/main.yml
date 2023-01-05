@@ -1,0 +1,13 @@
+---
+
+httpd_port: "80"
+httpd_user: "apache"
+httpd_group: "apache"
+
+php_version: "php72"
+doc_root: "/var/www/html"
+mdb_root_pass: "root"
+mdb_db: "root"
+mdb_user: "root"
+mdb_pw: "root"
+domain_name: "apache.test"
