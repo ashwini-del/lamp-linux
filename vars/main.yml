@@ -11,3 +11,9 @@ mdb_db: "root"
 mdb_user: "root"
 mdb_pw: "root"
 domain_name: "apache.test"
+
+http_port: "80"
+disable_default: true
+db_user: "root"
+db_pass: "root"
+db_name: "root"
