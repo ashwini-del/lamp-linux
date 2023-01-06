@@ -40,50 +40,41 @@
     - test.php
     - test.html
 #Installing the database
-- name: Install firewalld
-  yum: 
-    name: firewalld
-    state: present
-
-- name: Start firewalld
-  service: 
-    name: firewalld
+# install all prereqisites
+- name: Install LAMP Packages
+  yum: name={{ item }} update_cache=yes state=present
+  loop: [ 'mysql-server', 'python3-pymysql', 'php-mysql']
+  notify:
+      - Restart mysql
+#start and enable mysql service
+- name: start and enable mysql service
+  service:
+    name: mysql
     state: started
-
-- name: Enable the Service
-  systemd:
-    name: firewalld
-    enabled: yes 
-
-- name: Deploy and Configure Database
-  yum: 
-    name: mariadb-server
-    state: present
-  
-- name: Start Database
-  service: 
-    name: mariadb
-    state: started
-
-- name: Enable Database
-  systemd:
-    name: mariadb
     enabled: yes
-
-- name: Configuring firewall for Database
-  firewalld:
-    port: 3306/tcp
-    zone: public
-    permanent: yes
-    immediate: yes
-    state: enabled
-
-- name: Make sure pymysql is present
-  pip:
-    name: pymysql
+#creating mysql user and database
+- name: creating mysql user
+  mysql_user:
+    name: "{{db_user}}"
+    password: "{{db_pass}}"
+    priv: '*.*:ALL,GRANT'
+    host: localhost
     state: present
-
-- name: Install mysql
-  yum:
-    name: MySQL-python
-    state: latest
+- name: creating database
+  mysql_db:
+    name: "{{db_name}}"
+    state: present
+#enable root login to user
+- name: Enable remote login to mysql
+  lineinfile:
+      path: /etc/mysql/mysql.conf.d/mysqld.cnf
+      regexp: '^bind-address'
+      line: 'bind-address = 0.0.0.0'
+      backup: yes
+  notify:
+      - Restart mysql
+- name: Sets the root password
+  mysql_user:
+    name: root
+    password: "{{ db_pass }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock

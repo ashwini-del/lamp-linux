@@ -11,3 +11,12 @@ mdb_db: "root"
 mdb_user: "root"
 mdb_pw: "root"
 domain_name: "apache.test"
+#ubuntu vars
+http_port: "80"
+http_host: "/var/www/html"
+
+db_user: "root"
+db_pass: "root"
+db_name: "root"
+
+

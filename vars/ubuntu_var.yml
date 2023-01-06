@@ -3,4 +3,5 @@ disable_default: true
 db_user: "root"
 db_pass: "root"
 db_name: "root"
+http_host: "/var/www/html"
 
