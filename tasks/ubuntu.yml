@@ -13,7 +13,35 @@
       loop: [ 'apache2', 'mysql-server', 'python3-pymysql', 'php', 'php-mysql', 'libapache2-mod-php', 'perl' ]
       notify:
          - Restart mysql
-#start and enable mysql service
+# Create Document root
+    - name: Create document root
+      file:
+        path: "/var/www/html"
+        state: directory
+        owner: root
+        mode: '0755'
+
+    - name: Set up Apache virtualhost
+      template:
+        src: apache.conf.j2
+        dest: "/etc/apache2/sites-available/"
+      notify: Reload Apache
+
+    - name: "UFW - Allow HTTP on port {{ http_port }}"
+      ufw:
+        rule: allow
+        port: "{{ http_port }}"
+        proto: tcp
+
+# PHP Info Page
+    - name: Sets Up PHP Info Page
+      template:
+        src: info.php.j2
+        dest: "/var/www/html/info.php"
+      notify:
+          - Reload Apache
+          - Restart Apache
+    #start and enable mysql service
     - name: start and enable mysql service
       service:
         name: mysql
@@ -45,32 +73,4 @@
         name: root
         password: "{{ db_pass }}"
         login_unix_socket: /var/run/mysqld/mysqld.sock
-# Create Document root
-    - name: Create document root
-      file:
-        path: "/var/www/html"
-        state: directory
-        owner: root
-        mode: '0755'
-
-    - name: Set up Apache virtualhost
-      template:
-        src: apache.conf.j2
-        dest: "/etc/apache2/sites-available/"
-      notify: Reload Apache
-
-    - name: "UFW - Allow HTTP on port {{ http_port }}"
-      ufw:
-        rule: allow
-        port: "{{ http_port }}"
-        proto: tcp
-
-# PHP Info Page
-    - name: Sets Up PHP Info Page
-      template:
-        src: info.php.j2
-        dest: "/var/www/html/info.php"
-      notify:
-          - Reload Apache
-          - Restart Apache
 
